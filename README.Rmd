@@ -1,8 +1,0 @@
----
-title: "README"
-author: "Stephanie Pusker"
-date: "2022-11-14"
-output: html_document
----
-
-
