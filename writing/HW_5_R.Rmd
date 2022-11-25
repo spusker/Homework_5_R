@@ -63,9 +63,7 @@ dc_homicides %>%
 dc_homicides <- dc_homicides %>%
   mutate(open = disposition != "Closed by arrest") %>% 
   group_by(victim_race) %>% 
-  filter(victim_race == c("Black", "Hispanic", "White")) %>% 
-  ungroup() %>% 
-  arrange(desc(victim_race))
+  mutate(victim_race = fct_lump_lowfreq(victim_race))
  
 
 ```
