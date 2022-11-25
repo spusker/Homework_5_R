@@ -28,6 +28,7 @@ library(leaflet)
 library(plotly)
 library(DT)
 library(viridis)
+library(rgdal)
 
 homicides <- read_csv("https://raw.githubusercontent.com/washingtonpost/data-homicides/master/homicide-data.csv")
 
@@ -48,9 +49,8 @@ dc_homicides
 
 ```
 
-Pick one city in the data. Create a map showing the locations of the homicides in that city, using the sf framework discussed in class. Use tigris to download boundaries for some sub-city geography (e.g., tracts, block groups, county subdivisions) to show as a layer underneath the points showing homicides. Use different facets for solved versus unsolved homicides and different colors to show the three race groups with the highest number of homicides for that city (you may find the fct_lump function from forcats useful for this).
 
-```{r}
+```{r, more data cleaning}
 
 dc_districts <- state_legislative_districts(state = "DC", cb = TRUE, class = "sf")
 
@@ -60,12 +60,38 @@ dc_homicides %>%
   group_by(victim_race) %>% 
   summarise(total = n())
 
-dc_homicides <- dc_homicides %>%
+dc_race <- dc_homicides %>%
   mutate(open = disposition != "Closed by arrest") %>% 
   group_by(victim_race) %>% 
-  mutate(victim_race = fct_lump_lowfreq(victim_race))
+  arrange(desc(victim_race)) %>% 
+  mutate(victim_race = fct_lump(victim_race)) %>% 
+  filter(!victim_race == c("Other", "Asian")) %>% 
+  ungroup() %>% 
+  slice(-c(43:45),
+        -c(1328:1334))
  
+dc_race %>% 
+  group_by(victim_race) %>% 
+  summarise(total = n())
 
 ```
 
+
+Pick one city in the data. Create a map showing the locations of the homicides in that city, using the sf framework discussed in class. Use tigris to download boundaries for some sub-city geography (e.g., tracts, block groups, county subdivisions) to show as a layer underneath the points showing homicides. Use different facets for solved versus unsolved homicides and different colors to show the three race groups with the highest number of homicides for that city (you may find the fct_lump function from forcats useful for this).
+
+```{r}
+
+EPSG <- make_EPSG()
+
+dc_race <- st_as_sf(dc_race, coords = c("lon", "lat")) %>% 
+  st_set_crs(2248)
+
+ggplot() +
+  geom_sf(data = dc_districts) +
+  geom_sf(data = dc_race, (aes(fill = victim_race,
+                               shape = disposition))) +
+  scale_color_viridis()
+
+
+```
 
