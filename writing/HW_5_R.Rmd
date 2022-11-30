@@ -31,8 +31,6 @@ library(plotly)
 library(DT)
 library(viridis)
 library(rgdal)
-library(tmap)
-library(cowplot)
 
 homicides <- read_csv("https://raw.githubusercontent.com/washingtonpost/data-homicides/master/homicide-data.csv")
 
@@ -93,15 +91,21 @@ dc_race_crs <- st_as_sf(dc_race, coords = c("lon", "lat")) %>%
 dc_districts_crs <- st_as_sf(dc_districts, coords = c("lon", "lat")) %>% 
   st_set_crs(2248)
 
-ggplot() +
-  geom_sf(data = dc_districts_crs) +
-  geom_sf(data = dc_race_crs, aes(color = victim_race)) +
-  facet_wrap(~ unsolved, labeller = labeller(.cols = unsolved_names)) +
-  ggtitle("Locations of Homicides in DC by Race and Disposition") +
-  theme_map() +
-  guides(color = guide_legend(title = "Victim Race"))
-
 unsolved_names <- c(`0` = "Solved", `1` = "Unsolved")
+
+cols <- c("")
+
+ggplot() +
+  geom_sf(data = dc_districts_crs, fill = "gray87", color = "gray57", 
+          alpha = 0.5) +
+  geom_sf(data = dc_race_crs, aes(color = victim_race),
+          size = 2, alpha = 0.5) +
+  facet_wrap(~ unsolved, labeller = labeller(.cols = unsolved_names)) +
+  ggtitle("Locations of Homicides in DC by Race and Solved Status") +
+  guides(color = guide_legend(title = "Victim Race")) +
+  scale_color_manual(values = c("Black" = "dodgerblue4", "Hispanic" = "deeppink2",
+                                "White" = "darkorchid1")) +
+  theme_map()
   
 ```
 
