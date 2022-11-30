@@ -63,7 +63,7 @@ dc_homicides %>%
   summarise(total = n())
 
 dc_race <- dc_homicides %>%
-  mutate(unsovled = disposition != "Closed by arrest") %>% 
+  mutate(unsovled = disposition == c("Closed without arrest", "Open/No arrest")) %>% 
   group_by(victim_race) %>% 
   arrange(desc(victim_race)) %>% 
   mutate(victim_race = fct_lump(victim_race)) %>% 
