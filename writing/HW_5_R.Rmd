@@ -29,6 +29,8 @@ library(plotly)
 library(DT)
 library(viridis)
 library(rgdal)
+library(tmap)
+library(cowplot)
 
 homicides <- read_csv("https://raw.githubusercontent.com/washingtonpost/data-homicides/master/homicide-data.csv")
 
@@ -61,7 +63,7 @@ dc_homicides %>%
   summarise(total = n())
 
 dc_race <- dc_homicides %>%
-  mutate(open = disposition != "Closed by arrest") %>% 
+  mutate(unsovled = disposition != "Closed by arrest") %>% 
   group_by(victim_race) %>% 
   arrange(desc(victim_race)) %>% 
   mutate(victim_race = fct_lump(victim_race)) %>% 
@@ -83,15 +85,23 @@ Pick one city in the data. Create a map showing the locations of the homicides i
 
 EPSG <- make_EPSG()
 
-dc_race <- st_as_sf(dc_race, coords = c("lon", "lat")) %>% 
+dc_race_crs <- st_as_sf(dc_race, coords = c("lon", "lat")) %>% 
   st_set_crs(2248)
 
-ggplot() +
-  geom_sf(data = dc_districts) +
-  geom_sf(data = dc_race, (aes(fill = victim_race,
-                               shape = disposition))) +
-  scale_color_viridis()
+dc_districts_crs <- st_as_sf(dc_districts, coords = c("lon", "lat")) %>% 
+  st_set_crs(2248)
 
+dc_plot <- ggplot() +
+  geom_sf(data = dc_districts_crs) +
+  geom_sf(data = dc_race_crs, aes(color = victim_race)) +
+  theme_map() +
+  facet_wrap(~ disposition)
+
+ggplot() +
+  geom_sf(data = dc_districts_crs) +
+  geom_sf(data = dc_race_crs, aes(color = victim_race)) +
+  theme_map() +
+  facet_wrap(~ disposition)
 
 ```
 
