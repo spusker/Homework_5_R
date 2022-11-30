@@ -2,7 +2,9 @@
 title: "hw_5_R"
 author: "Stephanie Pusker"
 date: "2022-11-13"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -71,6 +73,8 @@ dc_race <- dc_homicides %>%
   ungroup() %>% 
   slice(-c(43:45),
         -c(1328:1334))
+
+dc_race$unsovled <- as.integer(dc_race$unsovled == "true")
  
 dc_race %>% 
   group_by(victim_race) %>% 
