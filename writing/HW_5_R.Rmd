@@ -102,9 +102,9 @@ ggplot() +
   geom_sf(data = dc_race_crs, aes(color = victim_race)) +
   facet_wrap(~ disposition) +
   ggtitle("Locations of Homicides in DC by Race and Disposition") +
-  scale_fill_manual(legend)
+  theme_map() +
+  guides(color = guide_legend(title = "Victim Race"))
 
-legend <- "Victim Race"
 
 ```
 
