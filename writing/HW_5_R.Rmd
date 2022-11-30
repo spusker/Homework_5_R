@@ -65,7 +65,7 @@ dc_homicides %>%
   summarise(total = n())
 
 dc_race <- dc_homicides %>%
-  mutate(unsovled = disposition == c("Closed without arrest", "Open/No arrest")) %>% 
+  mutate(unsovled = disposition != "Closed by arrest") %>% 
   group_by(victim_race) %>% 
   arrange(desc(victim_race)) %>% 
   mutate(victim_race = fct_lump(victim_race)) %>% 
@@ -74,7 +74,7 @@ dc_race <- dc_homicides %>%
   slice(-c(43:45),
         -c(1328:1334))
 
-dc_race$unsovled <- as.integer(dc_race$unsovled == "true")
+dc_race$unsolved <- as.integer(as.logical(dc_race$unsolved))
  
 dc_race %>% 
   group_by(victim_race) %>% 
