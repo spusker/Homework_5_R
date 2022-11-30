@@ -1,5 +1,5 @@
 ---
-title: "hw_5_R"
+title: "Homework_5_R"
 author: "Stephanie Pusker"
 date: "2022-11-13"
 output:
