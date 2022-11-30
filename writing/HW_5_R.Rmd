@@ -65,7 +65,7 @@ dc_homicides %>%
   summarise(total = n())
 
 dc_race <- dc_homicides %>%
-  mutate(unsovled = disposition != "Closed by arrest") %>% 
+  mutate(unsolved = disposition != "Closed by arrest") %>% 
   group_by(victim_race) %>% 
   arrange(desc(victim_race)) %>% 
   mutate(victim_race = fct_lump(victim_race)) %>% 
@@ -74,8 +74,8 @@ dc_race <- dc_homicides %>%
   slice(-c(43:45),
         -c(1328:1334))
 
-dc_race$unsolved <- as.integer(as.logical(dc_race$unsolved))
- 
+dc_race$unsolved <- as.numeric(dc_race$unsolved)
+
 dc_race %>% 
   group_by(victim_race) %>% 
   summarise(total = n())
@@ -93,20 +93,15 @@ dc_race_crs <- st_as_sf(dc_race, coords = c("lon", "lat")) %>%
 dc_districts_crs <- st_as_sf(dc_districts, coords = c("lon", "lat")) %>% 
   st_set_crs(2248)
 
-dc_plot <- ggplot() +
-  geom_sf(data = dc_districts_crs) +
-  geom_sf(data = dc_race_crs, aes(color = victim_race)) +
-  theme_map() +
-  facet_wrap(~ disposition)
-
 ggplot() +
   geom_sf(data = dc_districts_crs) +
   geom_sf(data = dc_race_crs, aes(color = victim_race)) +
-  facet_wrap(~ disposition) +
+  facet_wrap(~ unsolved, labeller = labeller(.cols = unsolved_names)) +
   ggtitle("Locations of Homicides in DC by Race and Disposition") +
   theme_map() +
   guides(color = guide_legend(title = "Victim Race"))
 
-
+unsolved_names <- c(`0` = "Solved", `1` = "Unsolved")
+  
 ```
 
